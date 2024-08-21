@@ -3,7 +3,7 @@ import json
 import os
 from youtubesearchpython import CustomSearch, VideoSortOrder
 import scrapetube
-
+import requests
 def get_youtube_channel_name(video_id):
     try:
         command = [
@@ -96,3 +96,63 @@ def get_channel_id_from_name(channel_name):
         return search_result['result'][0]['channel']['id']
     else:
         raise Exception(f"Unable to find channel ID for '{channel_name}'")
+    
+EXTERNAL_API_BASE_URL = 'http://localhost:8110/yt-nexus'
+
+def post_word_to_external_db(word):
+    try:
+        response = requests.post(f"{EXTERNAL_API_BASE_URL}/dictionary", json={"word": word})
+        response.raise_for_status()
+        return response.json()["word_id"]
+    except requests.RequestException as e:
+        print(f"Error posting word to external database: {e}")
+        raise
+
+def post_channel_to_external_db(channel_name):
+    try:
+        response = requests.post(f"{EXTERNAL_API_BASE_URL}/channel", json={"channel_name": channel_name})
+        response.raise_for_status()
+        return response.json()['channel_id']
+    except requests.RequestException as e:
+        print(f"Error posting channel to external database: {e}")
+        raise
+
+def post_video_to_external_db(channel_id, video_id, word_counts):
+    try:
+        data = {
+            "channel_id": channel_id,
+            "video_id": video_id,
+            "word_counts": word_counts
+        }
+        response = requests.post(f"{EXTERNAL_API_BASE_URL}/video", json=data)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"Error posting video to external database: {e}")
+        raise
+    
+def fetch_videos_by_keyword(channel_name, keyword):
+    try:
+        response = requests.get(f"{EXTERNAL_API_BASE_URL}/channel/{channel_name}/keyword/{keyword}")
+        response.raise_for_status()
+        return response.json()["videos"]
+    except requests.RequestException as e:
+        print(f"Error fetching videos with keyword from external database: {e}")
+        raise
+    
+def fetch_top_videos_by_channel(channel_name):
+    try:
+        response = requests.get(f"{EXTERNAL_API_BASE_URL}/channel/{channel_name}/top-videos")
+        response.raise_for_status()
+        return response.json()["top_videos"]
+    except requests.RequestException as e:
+        print(f"Error fetching top videos from external database: {e}")
+        raise
+    
+def fetch_common_words_by_channel(channel_name):
+    try:
+        response = requests.get(f"{EXTERNAL_API_BASE_URL}/channel/{channel_name}/common-words")
+        response.raise_for_status()
+        return response.json()["common_words"]
+    except requests.RequestException as e:
+        print(f"Error fetching common words from external database: {e}")
+        raise

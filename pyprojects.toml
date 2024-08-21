@@ -1,21 +1,21 @@
 [tool.poetry]
-name = "yt-nexus"
+name = "yt-nexus-db"
 version = "0.1.0"
-description = "A Flask API for accessing YouTube video transcripts, channel information, and related data."
+description = "An API for transcribing YouTube videos and storing metadata, used by the YT Nexus client."
 authors = ["Keagan Gilmore <keagangilmore@gmail.com>"]
-license = "Proprietary"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.8"
 flask = "^2.0"
-flask-cors = "^3.1"
-sqlite = "*"
-yt-dlp = "*"
-scrapetube = "*"
-youtubesearchpython = "*"
+flask-cors = "^3.0"
+requests = "^2.26"
+yt-dlp = "^2024.8.0"
+scrapetube = "^1.0"
+youtubesearchpython = "^1.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "*"
+pytest = "^6.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

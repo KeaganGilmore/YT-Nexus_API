@@ -1,108 +1,117 @@
-# YT Nexus
+### `README.md`
 
-YT Nexus is a Flask API for accessing YouTube video transcripts, channel information, and related data. It provides endpoints to retrieve video transcripts, find common words, get top videos, and more.
+# YT-Nexus-DB
 
-## Prerequisites
+YT-Nexus-DB is an API designed to provide YouTube video transcript and metadata storage, accessible via the YT Nexus client. 
 
-- Python 3.x
-- Flask
-- SQLite
-- `yt-dlp` (YouTube video downloader)
-- `scrapetube` (YouTube scraper)
-- `youtubesearchpython` (YouTube search API)
+## Features
+
+- Transcribe YouTube videos and store transcripts in the database.
+- Fetch video transcripts and channel information.
+- Retrieve top videos and common words from channels.
+- Search for videos by keyword.
 
 ## Installation
 
-1. **Clone the repository**:
-    ```bash
-    git clone https://github.com/KeaganGilmore/YT-Nexus_API.git
-    cd YT-Nexus_API
-    ```
+1. **Clone the repository:**
 
-2. **Install dependencies**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   git clone https://github.com/KeaganGilmore/yt-nexus-db.git
+   ```
 
-3. **Install `yt-dlp`**:
-    ```bash
-    pip install yt-dlp
-    ```
+2. **Navigate to the project directory:**
 
-4. **Install `scrapetube`**:
-    ```bash
-    pip install scrapetube
-    ```
+   ```bash
+   cd yt-nexus-db
+   ```
 
-5. **Install `youtubesearchpython`**:
-    ```bash
-    pip install youtubesearchpython
-    ```
+3. **Install the dependencies:**
+
+   Ensure you have Python 3.8+ and pip installed. Then run:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Usage
 
-1. **Set up the database**:
-    Run the Flask application to initialize the SQLite database:
-    ```bash
-    python app.py
-    ```
+1. **Start the Flask server:**
 
-2. **Start the Flask application**:
-    ```bash
-    python app.py
-    ```
+   ```bash
+   python app.py
+   ```
 
-3. **Access the API endpoints**:
+2. **Access the API endpoints:**
 
-    - **Get Transcript of a Video**:
-      ```
-      GET /youtube/transcript/<video_id>
-      ```
-      - Returns the transcript and channel name for the specified video ID.
+   - **Transcribe a video:**
 
-    - **Get Video Transcript**:
-      ```
-      GET /youtube/video/<video_id>
-      ```
-      - Returns the transcript for the specified video ID.
+     ```http
+     GET /youtube/transcript/<video_id>
+     ```
 
-    - **Get Common Words for a Channel**:
-      ```
-      GET /youtube/channel/<channel_name>/common-words
-      ```
-      - Returns the most common words used in videos of the specified channel.
+   - **Transcribe all videos from a channel:**
 
-    - **Get Top Videos for a Channel**:
-      ```
-      GET /youtube/channel/<channel_name>/top-videos
-      ```
-      - Returns the top videos for the specified channel based on word count.
+     ```http
+     GET /youtube/channel/<channel_name>/transcribe
+     ```
 
-    - **Get Videos with a Specific Keyword**:
-      ```
-      GET /youtube/channel/<channel_name>/keyword/<keyword>
-      ```
-      - Returns a list of videos containing the specified keyword in the specified channel.
+### About Us
 
-    - **Transcribe All Videos in a Channel**:
-      ```
-      GET /youtube/channel/<channel_name>/transcribe
-      ```
-      - Returns transcripts for all videos in the specified channel.
+Welcome to YT Nexus Python API, a key component of the YT Nexus ecosystem, deployed by LX Library (https://lxlibrary.online).
 
-## Code Structure
+In response to recent changes in YouTube's regulations that rendered previous YouTube Keyword Search (YTKS) setups ineffective (at the time of writing, changes may occur), we’ve developed the YT Nexus a DB. 
 
-- **`app.py`**: Main Flask application entry point.
-- **`youtube/views.py`**: Contains route definitions for YouTube-related endpoints.
-- **`database.py`**: Contains database schema creation and helper functions for interacting with the SQLite database.
-- **`utils.py`**: Contains utility functions for interacting with YouTube (e.g., fetching transcripts, channel info).
+This API is designed to handle video transcriptions and manage metadata efficiently by posting to the yt-nexus db which will be accessible to anyone (largely via the client side), adapting to the new constraints imposed by YouTube.
 
-## Error Handling
+**Key Features:**
+- **Transcribe YouTube Videos:** Retrieve accurate transcripts of YouTube videos using our API.
+- **Channel Metadata Management:** Store and access information about YouTube channels and their videos.
+- **Community Contributions:** Contribute to a collective effort by running scripts to transcribe videos and enrich our database.
 
-The API returns standard HTTP status codes:
-- `200 OK` for successful requests.
-- `500 Internal Server Error` for server-side issues (e.g., failed to fetch transcript).
+We value community contributions immensely. You can get involved by:
 
-## Contributing
+1. **Cloning the Repository:** Access the source code and setup instructions at [YT-Nexus-DB](https://github.com/KeaganGilmore/yt-nexus-db).
+2. **Running the API:** Deploy the API on your local environment to start working with video transcriptions and metadata.
+3. **Contributing:** Enhance the project by improving scripts or adding new features. Your contributions help us build a more comprehensive tool for the entire community.
 
-Feel free to contribute to this project by submitting issues or pull requests. For any questions or issues, please contact Keagan Gilmore at keagangilmore@gmail.com.
+Due to the limitations on direct interactions with YouTube for video transcription, the effectiveness of this project relies on collaborative efforts. Your participation is crucial in creating a robust and reliable YouTube keyword search solution.
+
+We appreciate your support in making YT Nexus a valuable resource for everyone!
+
+
+### License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- **Email**: [keagangilmore@gmail.com](mailto:keagangilmore@gmail.com)
+- **Discord**: [keagan2980](https://discord.com/users/keagan2980)
+```
+## Acknowledgments
+
+- Special thanks to all contributors and the open-source community.
+- BattlePig, the original creator of ytks.
+```
+
+### `pyproject.toml`
+
+### Instructions for `pyproject.toml`
+
+1. **Install Poetry (if not already installed):**
+
+   ```bash
+   pip install poetry
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   poetry install
+   ```
+
+3. **Run the application:**
+
+   ```bash
+   poetry run python app.py
+   ```
