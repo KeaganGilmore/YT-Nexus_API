@@ -1,9 +1,24 @@
+import logging
 import subprocess
 import json
 import os
-from youtubesearchpython import CustomSearch, VideoSortOrder
-import scrapetube
 import requests
+import re
+import sqlite3
+from flask import Blueprint, jsonify, request
+from utils import *
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from time import time
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Constants
+EXTERNAL_API_BASE_URL = 'https://lxlibrary.online/yt-nexus/yt-nexus'
+REQUEST_TIMEOUT = 10  # Increase this if necessary
+MAX_WORKERS = 5  # Number of concurrent workers
+
+youtube_bp = Blueprint('youtube', __name__)
+
 def get_youtube_channel_name(video_id):
     try:
         command = [
@@ -17,9 +32,11 @@ def get_youtube_channel_name(video_id):
         ]
         output = subprocess.check_output(command, universal_newlines=True)
         return output.strip()
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Failed to get channel name for video {video_id}: {e}")
         return "Error: Failed to get channel name."
     except Exception as e:
+        logging.error(f"An error occurred while getting channel name for video {video_id}: {e}")
         return f"An error occurred: {str(e)}"
 
 def get_youtube_transcript(video_id):
@@ -47,112 +64,54 @@ def get_youtube_transcript(video_id):
                     transcript += seg['utf8']
         os.remove(transcript_file)
         return transcript.strip()
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Failed to download or process subtitles for video {video_id}: {e}")
         return "Error: Failed to download or process subtitles."
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        logging.error(f"Subtitle file not found for video {video_id}: {e}")
         return "Error: Subtitle file not found."
     except Exception as e:
+        logging.error(f"An error occurred while processing subtitles for video {video_id}: {e}")
         return f"An error occurred: {str(e)}"
-    
-def get_recent_videos_by_channel(channel_name):
-    # Prepare the search query with the channel name
-    search_query = f'{channel_name}'
-
-    video_ids = []
-    next_page_token = None
-
-    while True:
-        # Perform the search
-        videos_search = CustomSearch(search_query, VideoSortOrder.uploadDate, limit=20)
-        search_result = videos_search.result()
-
-        if not search_result['result']:
-            break
-
-        for video in search_result['result']:
-            # Filter by channel name to ensure the video is from the correct channel
-            if video['channel']['name'] == channel_name:
-                video_ids.append(video['id'])
-
-        # Check if there's a next page
-        if 'continuation' in search_result:
-            next_page_token = search_result['continuation']
-        else:
-            break
-
-    return video_ids
-
-def get_channel_video_ids(channel_id):
-    videos = scrapetube.get_channel(channel_id)
-    video_ids = [video['videoId'] for video in videos]
-    return video_ids
-
-def get_channel_id_from_name(channel_name):
-    search_query = f'{channel_name}'
-    videos_search = CustomSearch(search_query, VideoSortOrder.relevance, limit=1)
-    search_result = videos_search.result()
-
-    if search_result['result']:
-        return search_result['result'][0]['channel']['id']
-    else:
-        raise Exception(f"Unable to find channel ID for '{channel_name}'")
-    
-EXTERNAL_API_BASE_URL = 'http://localhost:8110/yt-nexus'
 
 def post_word_to_external_db(word):
+    start_time = time()
     try:
-        response = requests.post(f"{EXTERNAL_API_BASE_URL}/dictionary", json={"word": word})
+        logging.debug(f"Posting word '{word}' to external database. [Started at {start_time:.2f}s]")
+        response = requests.post(f"{EXTERNAL_API_BASE_URL}/dictionary", json={"word": word}, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
-        return response.json()["word_id"]
+        word_id = response.json()["word_id"]
+        end_time = time()
+        logging.debug(f"Received word ID '{word_id}' for word '{word}'. [Completed at {end_time:.2f}s, Duration: {end_time - start_time:.2f}s]")
+        return word, word_id
     except requests.RequestException as e:
-        print(f"Error posting word to external database: {e}")
-        raise
+        logging.error(f"Error posting word '{word}' to external database: {e}")
+        return word, None
 
 def post_channel_to_external_db(channel_name):
     try:
-        response = requests.post(f"{EXTERNAL_API_BASE_URL}/channel", json={"channel_name": channel_name})
+        logging.debug(f"Posting channel '{channel_name}' to external database.")
+        response = requests.post(f"{EXTERNAL_API_BASE_URL}/channel", json={"channel_name": channel_name}, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
-        return response.json()['channel_id']
+        channel_id = response.json()['channel_id']
+        logging.debug(f"Received channel ID '{channel_id}' for channel '{channel_name}'.")
+        return channel_id
     except requests.RequestException as e:
-        print(f"Error posting channel to external database: {e}")
+        logging.error(f"Error posting channel '{channel_name}' to external database: {e}")
         raise
 
 def post_video_to_external_db(channel_id, video_id, word_counts):
     try:
+        logging.debug(f"Posting video '{video_id}' with channel_id '{channel_id}' to external database.")
         data = {
             "channel_id": channel_id,
             "video_id": video_id,
             "word_counts": word_counts
         }
-        response = requests.post(f"{EXTERNAL_API_BASE_URL}/video", json=data)
+        response = requests.post(f"{EXTERNAL_API_BASE_URL}/video", json=data, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
+        logging.debug(f"Successfully posted video '{video_id}'.")
     except requests.RequestException as e:
-        print(f"Error posting video to external database: {e}")
+        logging.error(f"Error posting video '{video_id}' to external database: {e}")
         raise
-    
-def fetch_videos_by_keyword(channel_name, keyword):
-    try:
-        response = requests.get(f"{EXTERNAL_API_BASE_URL}/channel/{channel_name}/keyword/{keyword}")
-        response.raise_for_status()
-        return response.json()["videos"]
-    except requests.RequestException as e:
-        print(f"Error fetching videos with keyword from external database: {e}")
-        raise
-    
-def fetch_top_videos_by_channel(channel_name):
-    try:
-        response = requests.get(f"{EXTERNAL_API_BASE_URL}/channel/{channel_name}/top-videos")
-        response.raise_for_status()
-        return response.json()["top_videos"]
-    except requests.RequestException as e:
-        print(f"Error fetching top videos from external database: {e}")
-        raise
-    
-def fetch_common_words_by_channel(channel_name):
-    try:
-        response = requests.get(f"{EXTERNAL_API_BASE_URL}/channel/{channel_name}/common-words")
-        response.raise_for_status()
-        return response.json()["common_words"]
-    except requests.RequestException as e:
-        print(f"Error fetching common words from external database: {e}")
-        raise
+

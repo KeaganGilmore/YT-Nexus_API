@@ -92,26 +92,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - Special thanks to all contributors and the open-source community.
 - BattlePig, the original creator of ytks.
-```
-
-### `pyproject.toml`
-
-### Instructions for `pyproject.toml`
-
-1. **Install Poetry (if not already installed):**
-
-   ```bash
-   pip install poetry
-   ```
-
-2. **Install dependencies:**
-
-   ```bash
-   poetry install
-   ```
-
-3. **Run the application:**
-
-   ```bash
-   poetry run python app.py
-   ```
+- Dwidge [@dwidge](https://github.com/dwidge) for Deployment of the YT Nexus DB.
