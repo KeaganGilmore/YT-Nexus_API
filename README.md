@@ -1,15 +1,13 @@
-### `README.md`
-
 # YT-Nexus-DB
 
-YT-Nexus-DB is an API designed to provide YouTube video transcript and metadata storage, accessible via the YT Nexus client. 
+YT-Nexus-DB is an API designed to facilitate the storage and retrieval of YouTube video transcripts and metadata. It serves as a backbone for the YT Nexus client, enabling users to transcribe videos, analyze channel data, and perform keyword searches across a vast library of YouTube content.
 
 ## Features
 
-- Transcribe YouTube videos and store transcripts in the database.
-- Fetch video transcripts and channel information.
-- Retrieve top videos and common words from channels.
-- Search for videos by keyword.
+- **Video Transcription:** Transcribe YouTube videos and store their transcripts in a structured database.
+- **Metadata Management:** Fetch and store detailed video metadata, including channel information.
+- **Keyword Search:** Perform keyword searches to find relevant videos across stored transcripts.
+- **Channel Analytics:** Retrieve top videos and common words from specific channels, helping to uncover trends and patterns.
 
 ## Installation
 
@@ -27,11 +25,8 @@ YT-Nexus-DB is an API designed to provide YouTube video transcript and metadata 
 
 3. **Install the dependencies:**
 
-   Ensure you have Python 3.8+ and pip installed. Then run:
+   See pyprojects.toml for dependencies
 
-   ```bash
-   pip install -r requirements.txt
-   ```
 
 ## Usage
 
@@ -43,7 +38,7 @@ YT-Nexus-DB is an API designed to provide YouTube video transcript and metadata 
 
 2. **Access the API endpoints:**
 
-   - **Transcribe a video:**
+   - **Transcribe a specific video:**
 
      ```http
      GET /youtube/transcript/<video_id>
@@ -55,41 +50,58 @@ YT-Nexus-DB is an API designed to provide YouTube video transcript and metadata 
      GET /youtube/channel/<channel_name>/transcribe
      ```
 
-### About Us
+   - **Search for videos by keyword:**
 
-Welcome to YT Nexus Python API, a key component of the YT Nexus ecosystem, deployed by LX Library (https://lxlibrary.online).
+     ```http
+     GET /youtube/search/<keyword>
+     ```
 
-In response to recent changes in YouTube's regulations that rendered previous YouTube Keyword Search (YTKS) setups ineffective (at the time of writing, changes may occur), we’ve developed the YT Nexus a DB. 
+   - **Fetch channel metadata:**
 
-This API is designed to handle video transcriptions and manage metadata efficiently by posting to the yt-nexus db which will be accessible to anyone (largely via the client side), adapting to the new constraints imposed by YouTube.
+     ```http
+     GET /youtube/channel/<channel_name>/metadata
+     ```
 
-**Key Features:**
-- **Transcribe YouTube Videos:** Retrieve accurate transcripts of YouTube videos using our API.
-- **Channel Metadata Management:** Store and access information about YouTube channels and their videos.
-- **Community Contributions:** Contribute to a collective effort by running scripts to transcribe videos and enrich our database.
+   - **Retrieve top videos from a channel:**
 
-We value community contributions immensely. You can get involved by:
+     ```http
+     GET /youtube/channel/<channel_name>/top_videos
+     ```
 
-1. **Cloning the Repository:** Access the source code and setup instructions at [YT-Nexus-DB](https://github.com/KeaganGilmore/yt-nexus-db).
-2. **Running the API:** Deploy the API on your local environment to start working with video transcriptions and metadata.
-3. **Contributing:** Enhance the project by improving scripts or adding new features. Your contributions help us build a more comprehensive tool for the entire community.
+   - **Get common words used in a channel's videos:**
 
-Due to the limitations on direct interactions with YouTube for video transcription, the effectiveness of this project relies on collaborative efforts. Your participation is crucial in creating a robust and reliable YouTube keyword search solution.
+     ```http
+     GET /youtube/channel/<channel_name>/common_words
+     ```
 
-We appreciate your support in making YT Nexus a valuable resource for everyone!
+## About Us
 
+Welcome to YT Nexus Python API, an essential component of the YT Nexus ecosystem, deployed by [LX Library](https://lxlibrary.online).
 
-### License
+**Recent Changes:**
+- Due to YouTube's updated policies, traditional methods for keyword searches have become less effective. YT Nexus-DB is our response, focusing on transcript and metadata storage to support robust content analysis and keyword discovery.
+
+**Community Contributions:**
+- **Get Involved:** We highly encourage contributions from the community. Whether it's enhancing scripts, adding features, or improving documentation, your involvement makes YT Nexus-DB a better tool for everyone.
+
+**Key Objectives:**
+- **Collaborative Effort:** The effectiveness of YT Nexus-DB is amplified by community support. Together, we can build a comprehensive database that adapts to YouTube's evolving ecosystem.
+
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-- **Email**: [keagangilmore@gmail.com](mailto:keagangilmore@gmail.com)
-- **Discord**: [keagan2980](https://discord.com/users/keagan2980)
-```
+- **Email:** [keagangilmore@gmail.com](mailto:keagangilmore@gmail.com)
+- **Discord:** [keagan2980](https://discord.com/users/keagan2980)
+
 ## Acknowledgments
 
-- Special thanks to all contributors and the open-source community.
-- BattlePig, the original creator of ytks.
-- Dwidge [@dwidge](https://github.com/dwidge) for Deployment of the YT Nexus DB.
+- **Contributors:** Special thanks to all contributors and the open-source community.
+- **YTKS Inspiration:** BattlePig, the original creator of YTKS, for laying the groundwork.
+- **Deployment Support:** Dwidge [@dwidge](https://github.com/dwidge) for assisting in the deployment of YT Nexus DB.
+
+## Note
+
+The current server hosting YT Nexus-DB is not optimized for large-scale data scraping, which limits its efficiency. Community funding would greatly enhance our ability to handle the data volume and improve system performance. Your support is crucial in scaling this project to meet its full potential.
